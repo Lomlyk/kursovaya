@@ -23,9 +23,10 @@ from ast import (
 )
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation, getcontext
-from math import acos, asin, atan, cos, degrees, e, exp, factorial, gcd, log, log10, pi, radians, sin, sqrt, tan
+from math import acos, asin, atan, cos, degrees, e, exp, factorial, log, log10, pi, radians, sin, sqrt, tan
 from statistics import mean, median
 from typing import Callable
+from math import gcd
 
 
 ALLOWED_FUNCTIONS: dict[str, Callable[..., float]] = {
@@ -163,12 +164,12 @@ class StatisticsService:
     def summarize(self, raw_values: str) -> dict[str, float]:
         numbers = self.parse_numbers(raw_values)
         return {
-            "count": len(numbers),
-            "min": min(numbers),
-            "max": max(numbers),
-            "mean": mean(numbers),
-            "median": median(numbers),
-            "sum": sum(numbers),
+            "Количество чисел": len(numbers),
+            "Минимум": min(numbers),
+            "Максимум": max(numbers),
+            "Среднее арифметическое": mean(numbers),
+            "Медиана": median(numbers),
+            "Сумма": sum(numbers),
         }
 
 

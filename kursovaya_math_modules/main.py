@@ -92,13 +92,35 @@ class MathModulesApp(tk.Tk):
             row=1, column=0, sticky="ew", pady=(12, 8)
         )
 
-        ttk.Button(frame, text="Вычислить", style="Accent.TButton", command=self._calculate_expression).grid(row=2, column=0, sticky="w")
+        button_panel = ttk.Frame(frame, style="Card.TFrame")
+        button_panel.grid(row=2, column=0, sticky="w", pady=(0, 8))
+
+        quick_buttons = (
+            ("sin(x)", "sin("),
+            ("cos(x)", "cos("),
+            ("tan(x)", "tan("),
+            ("sqrt(x)", "sqrt("),
+            ("log(x)", "log("),
+            ("log10(x)", "log10("),
+            ("exp(x)", "exp("),
+            ("abs(x)", "abs("),
+            ("pi", "pi"),
+            ("e", "e"),
+        )
+        for index, (caption, token) in enumerate(quick_buttons):
+            ttk.Button(
+                button_panel,
+                text=caption,
+                command=lambda value=token: self._insert_expression_token(value),
+            ).grid(row=index // 5, column=index % 5, padx=(0, 8), pady=(0, 8), sticky="w")
+
+        ttk.Button(frame, text="Вычислить", style="Accent.TButton", command=self._calculate_expression).grid(row=3, column=0, sticky="w")
 
         self.calculator_output = tk.Text(
             frame, height=12, wrap="word", bg="#f8fbff", fg="#1f2a44", relief="flat", font=("Consolas", 11)
         )
-        self.calculator_output.grid(row=3, column=0, sticky="nsew", pady=(12, 0))
-        frame.rowconfigure(3, weight=1)
+        self.calculator_output.grid(row=4, column=0, sticky="nsew", pady=(12, 0))
+        frame.rowconfigure(4, weight=1)
         return frame
 
     def _build_equation_tab(self, parent: ttk.Notebook) -> ttk.Frame:
@@ -181,27 +203,35 @@ class MathModulesApp(tk.Tk):
 
     def _build_number_tab(self, parent: ttk.Notebook) -> ttk.Frame:
         frame = ttk.Frame(parent, padding=18, style="Card.TFrame")
-        ttk.Label(frame, text="Теория чисел: НОД, НОК и проверка на простоту", style="Section.TLabel").grid(
-            row=0, column=0, columnspan=2, sticky="w"
-        )
+        ttk.Label(
+            frame,
+            text="Теория чисел: наибольший общий делитель, наименьшее общее кратное и проверка на простоту",
+            style="Section.TLabel",
+            wraplength=880,
+        ).grid(row=0, column=0, columnspan=2, sticky="w")
+        ttk.Label(
+            frame,
+            text="НОД означает наибольший общий делитель, а НОК означает наименьшее общее кратное.",
+            wraplength=880,
+        ).grid(row=1, column=0, columnspan=2, sticky="w", pady=(8, 10))
 
         self.number_a_var = tk.StringVar(value="24")
         self.number_b_var = tk.StringVar(value="36")
 
-        ttk.Label(frame, text="Первое число:").grid(row=1, column=0, sticky="e", padx=(0, 8), pady=8)
-        ttk.Entry(frame, textvariable=self.number_a_var, width=24).grid(row=1, column=1, sticky="w", pady=8)
-        ttk.Label(frame, text="Второе число:").grid(row=2, column=0, sticky="e", padx=(0, 8), pady=8)
-        ttk.Entry(frame, textvariable=self.number_b_var, width=24).grid(row=2, column=1, sticky="w", pady=8)
+        ttk.Label(frame, text="Первое число:").grid(row=2, column=0, sticky="e", padx=(0, 8), pady=8)
+        ttk.Entry(frame, textvariable=self.number_a_var, width=24).grid(row=2, column=1, sticky="w", pady=8)
+        ttk.Label(frame, text="Второе число:").grid(row=3, column=0, sticky="e", padx=(0, 8), pady=8)
+        ttk.Entry(frame, textvariable=self.number_b_var, width=24).grid(row=3, column=1, sticky="w", pady=8)
 
         ttk.Button(frame, text="Рассчитать", style="Accent.TButton", command=self._calculate_number_theory).grid(
-            row=3, column=0, columnspan=2, sticky="w", pady=10
+            row=4, column=0, columnspan=2, sticky="w", pady=10
         )
 
         self.number_output = tk.Text(
             frame, width=60, height=12, bg="#f8fbff", fg="#1f2a44", relief="flat", font=("Consolas", 11)
         )
-        self.number_output.grid(row=4, column=0, columnspan=2, sticky="nsew")
-        frame.rowconfigure(4, weight=1)
+        self.number_output.grid(row=5, column=0, columnspan=2, sticky="nsew")
+        frame.rowconfigure(5, weight=1)
         frame.columnconfigure(1, weight=1)
         return frame
 
@@ -272,6 +302,11 @@ class MathModulesApp(tk.Tk):
             "Проект использует модуль math и безопасный разбор AST, чтобы не выполнять произвольный код.",
         )
 
+    def _insert_expression_token(self, token: str) -> None:
+        current = self.expression_var.get().rstrip()
+        separator = "" if not current or current.endswith(("(", " ", "+", "-", "*", "/", "%", ",")) else " "
+        self.expression_var.set(f"{current}{separator}{token}")
+
     def _solve_quadratic(self) -> None:
         try:
             result = self.quadratic_solver.solve(float(self.a_var.get()), float(self.b_var.get()), float(self.c_var.get()))
@@ -325,8 +360,8 @@ class MathModulesApp(tk.Tk):
             tk.END,
             f"a = {result['a']}\n"
             f"b = {result['b']}\n"
-            f"НОД(a, b) = {result['gcd']}\n"
-            f"НОК(a, b) = {result['lcm']}\n"
+            f"Наибольший общий делитель (НОД): {result['gcd']}\n"
+            f"Наименьшее общее кратное (НОК): {result['lcm']}\n"
             f"a простое: {'да' if result['a_is_prime'] else 'нет'}\n"
             f"b простое: {'да' if result['b_is_prime'] else 'нет'}\n",
         )

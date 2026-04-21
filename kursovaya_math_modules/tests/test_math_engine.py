@@ -38,9 +38,9 @@ class QuadraticSolverTests(unittest.TestCase):
 class StatisticsServiceTests(unittest.TestCase):
     def test_summary(self) -> None:
         stats = StatisticsService().summarize("2, 4, 6, 8")
-        self.assertEqual(stats["count"], 4)
-        self.assertEqual(stats["sum"], 20)
-        self.assertEqual(stats["median"], 5.0)
+        self.assertEqual(stats["Количество чисел"], 4)
+        self.assertEqual(stats["Сумма"], 20)
+        self.assertEqual(stats["Медиана"], 5.0)
 
 
 class FinanceMathTests(unittest.TestCase):
